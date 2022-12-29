@@ -30,15 +30,8 @@ bullet_state = "ready"
 
 enemy_dy = 40
 enemy_list = []
-for i in range(1):
-    enemy_row = []
-    for j in range(10):
-        enemy_x = 50 + j * 50
-        enemy_y = 50 + i * 50
-        enemy_dx = 1
-        enemy_row.append([enemy_x, enemy_y, enemy_dx])
-    enemy_list.append(enemy_row)
-    
+
+level = 0
 score = 0
 
 game_over = False
@@ -71,6 +64,27 @@ def is_collision(enemy_x, enemy_y, player_x, player_y):
     
 # Game loop
 while running:
+    # Check if all enemies are dead
+    enemies_left = False
+    for enemy_row in enemy_list:
+        for enemy in enemy_row:
+            if enemy[0] is not None and enemy[1] is not None:
+                enemies_left = True
+                break
+        if enemies_left:
+            break
+    # If all enemies are gone, increase level and reset enemy rows
+    if not enemies_left:
+        level += 1
+        enemy_list = []
+        for i in range(level):
+            enemy_row = []
+            for j in range(10):
+                enemy_x = 50 + j * 50
+                enemy_y = 50 + i * 50
+                enemy_dx = 1
+                enemy_row.append([enemy_x, enemy_y, enemy_dx])
+            enemy_list.append(enemy_row)
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -158,9 +172,11 @@ while running:
             enemy_x, enemy_y, enemy_dx = j
             draw_enemy(enemy_x, enemy_y)
     
-    # Display the score
+    # Display the score + level
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+    level_text = font.render("Level: " + str(level), True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
+    screen.blit(level_text, (160, 10))
     
     # Display the game over screen if the game is over
     if game_over:
